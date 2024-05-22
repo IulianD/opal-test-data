@@ -22,13 +22,9 @@ second <- sapply(omics.cancer, function(organ){
     dt <- dt[order(rownames(dt)),]
     dt <- as.data.frame(dt[floor(nrow(dt)*55/100 + 1):nrow(dt),order(apply(dt, 2, sd), decreasing = TRUE)[1:min(200, ncol(dt))]])
     ind <- 0
-    vars <- lapply(names(dt), function(x){
-      ind <<- ind + 1
-      list(name=x, entityType='PARTICIPANT', valueType='decimal', isRepeatable='false', index=ind)
-    })
     dt <-cbind(rownames(dt), dt)
     names(dt)[1]<- 'PARTICIPANT_ID'
-    dt 
+    list(dt=dt) 
   }, simplify = FALSE)
 }, simplify = FALSE)
 
@@ -49,7 +45,7 @@ sapply(names(first), function(organ){
 nms <-sapply(names(second), function(organ){
   sapply(names(second[[organ]]), function(dt){
     nm <- paste0(toupper(organ), '_', toupper(dt)) 
-    write.csv(second[[organ]][[dt]], file = paste0(nm, '_2.csv'), sep=', ', row.names = FALSE)
+    write.csv(second[[organ]][[dt]]$dt, file = paste0(nm, '_2.csv'), sep=', ', row.names = FALSE)
     nm
   })
 })
@@ -57,8 +53,9 @@ write.table(t(as.vector(nms)), file='./names', quote = FALSE, row.names = FALSE,
 # and the total, for opal3
 sapply(names(omics.cancer), function(organ){
   sapply(names(omics.cancer[[organ]]), function(dt){
+    all.together <- rbind(first[[organ]][[dt]]$dt, second[[organ]][[dt]]$dt)
     nm <- paste0(toupper(organ), '_', toupper(dt)) 
-    write.csv(second[[organ]][[dt]], file = paste0(nm, '_3.csv'), sep=', ', row.names = FALSE)
+    write.csv(all.together, file = paste0(nm, '_3.csv'), sep=', ', row.names = FALSE)
   })
 })
 
