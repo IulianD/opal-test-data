@@ -9,7 +9,7 @@ first <- sapply(omics.cancer, function(organ){
               ind <- 0
               vars <- lapply(names(dt), function(x){
                 ind <<- ind + 1
-                list(name=x, entityType='PARTICIPANT', valueType='decimal', isRepeatable='false', index=ind)
+                list(name=x, entityType='PARTICIPANT', valueType='decimal', isRepeatable=FALSE, index=ind)
               })
               dt <-cbind(rownames(dt), dt)
               names(dt)[1]<- 'PARTICIPANT_ID'
