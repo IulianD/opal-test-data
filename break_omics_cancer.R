@@ -40,9 +40,9 @@ sapply(names(first), function(organ){
     nm <- paste0(toupper(organ), '_', toupper(dt)) 
     write.csv(first[[organ]][[dt]]$dt, file = paste0(nm, '_1.csv'), sep=', ', row.names = FALSE)
     vars <- first[[organ]][[dt]]$vars
-    vars$name <- nm
-    vars$entityType <- 'PARTICIPANT'
-    write_json(vars, paste0('variables_', nm, '.json'))
+
+    vars <- list(name=nm, entityType='PARTICIPANT', variables=vars)
+    write_json(vars, paste0('variables_', nm, '.json'), auto_unbox=TRUE)
   })
 })
 
