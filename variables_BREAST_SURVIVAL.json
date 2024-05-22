@@ -1,0 +1,1 @@
+{"name":"BREAST_SURVIVAL","entityType":"PARTICIPANT","variables":[{"name":"Survival","entityType":"PARTICIPANT","valueType":"decimal","isRepeatable":"false","index":1},{"name":"Death","entityType":"PARTICIPANT","valueType":"decimal","isRepeatable":"false","index":2}]}
