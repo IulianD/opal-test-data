@@ -1,6 +1,6 @@
 library(jsonlite)
-setwd('/mnt/shareddisk/Sophia/testdb/')
-load('/mnt/shareddisk/Sophia/testdb/omics.cancer.RData')
+setwd('/mnt/shareddisk/opal-test-data/')
+load('omics.cancer.RData')
 first <- sapply(omics.cancer, function(organ){
             sapply(organ, function(dt){
               dt <- dt[order(rownames(dt)),]
@@ -21,6 +21,11 @@ second <- sapply(omics.cancer, function(organ){
   sapply(organ, function(dt){
     dt <- dt[order(rownames(dt)),]
     dt <- as.data.frame(dt[floor(nrow(dt)*55/100 + 1):nrow(dt),order(apply(dt, 2, sd), decreasing = TRUE)[1:min(200, ncol(dt))]])
+    ind <- 0
+    vars <- lapply(names(dt), function(x){
+      ind <<- ind + 1
+      list(name=x, entityType='PARTICIPANT', valueType='decimal', isRepeatable='false', index=ind)
+    })
     dt <-cbind(rownames(dt), dt)
     names(dt)[1]<- 'PARTICIPANT_ID'
     dt 
@@ -34,14 +39,26 @@ sapply(names(first), function(organ){
   sapply(names(first[[organ]]), function(dt){
     nm <- paste0(toupper(organ), '_', toupper(dt)) 
     write.csv(first[[organ]][[dt]]$dt, file = paste0(nm, '_1.csv'), sep=', ', row.names = FALSE)
+    vars <- first[[organ]][[dt]]$vars
     vars$name <- nm
     vars$entityType <- 'PARTICIPANT'
     write_json(vars, paste0('variables_', nm, '.json'))
   })
 })
 
-sapply(names(second), function(organ){
+nms <-sapply(names(second), function(organ){
   sapply(names(second[[organ]]), function(dt){
-    write.csv(second[[organ]][[dt]], file = paste0(organ, '_', dt, '_2.csv'), sep=', ', row.names = FALSE)
+    nm <- paste0(toupper(organ), '_', toupper(dt)) 
+    write.csv(second[[organ]][[dt]], file = paste0(nm, '_2.csv'), sep=', ', row.names = FALSE)
+    nm
   })
 })
+write.table(t(as.vector(nms)), file='./names', quote = FALSE, row.names = FALSE, col.names = FALSE, sep = ' ')
+# and the total, for opal3
+sapply(names(omics.cancer), function(organ){
+  sapply(names(omics.cancer[[organ]]), function(dt){
+    nm <- paste0(toupper(organ), '_', toupper(dt)) 
+    write.csv(second[[organ]][[dt]], file = paste0(nm, '_3.csv'), sep=', ', row.names = FALSE)
+  })
+})
+
