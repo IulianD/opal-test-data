@@ -1,21 +1,23 @@
 library(jsonlite)
+library(tidyr)
 setwd('/mnt/shareddisk/opal-test-data/')
-load('omics.cancer.RData')
+#load('omics.cancer.RData')
 load('brca.RData')
-first <- sapply(omics.cancer, function(organ){
-            sapply(organ, function(dt){
-              dt <- dt[order(rownames(dt)),]
-              # take only the first 200 columns in decreasing order of their variance:
-              dt <- as.data.frame(dt[1:floor(nrow(dt)*55/100),order(apply(dt, 2, sd), decreasing = TRUE)[1:min(200, ncol(dt))]]) 
-              ind <- 0
-              vars <- lapply(names(dt), function(x){
-                ind <<- ind + 1
-                list(name=x, entityType='PARTICIPANT', valueType='decimal', isRepeatable=FALSE, index=ind)
-              })
-              dt <-cbind(rownames(dt), dt)
-              names(dt)[1]<- 'PARTICIPANT_ID'
-              list(dt = dt, vars = vars) 
-            }, simplify = FALSE)
+dfs <- brca[1:3]
+  first <- sapply(dfs, function(dt){
+      #      sapply(organ, function(dt){
+            #  dt <- as.data.frame(dt)
+           #   dt <- dt[order(rownames(dt)),]
+             
+            #  ind <- 0
+             dt<- pivot_longer(data.frame(PersonID=rownames(dt), dt),  !PersonID, names_to = "variable", values_to = "value")
+            vars <- lapply(names(dt), function(x){
+                list(name='PARTI', entityType='PARTICIPANT', valueType='decimal', isRepeatable=FALSE, index=ind)
+              #})
+              #dt <-cbind(rownames(dt), dt)
+              #names(dt)[1]<- 'PARTICIPANT_ID'
+              #list(dt = dt, vars = vars) 
+      #     }, simplify = FALSE)
 }, simplify = FALSE)
 
 second <- sapply(omics.cancer, function(organ){

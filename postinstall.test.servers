@@ -1,0 +1,20 @@
+# copy
+podman cp test_cnsim.json opal-rock_opal2_1:/opt/opal/data/
+podman cp test_cnsim.json opal-rock_opal1_1:/opt/opal/data/
+podman cp test_cnsim.json opal-rock_opal3_1:/opt/opal/data/
+podman cp cnsim1.csv opal-rock_opal1_1:/opt/opal/data/
+podman cp cnsim2.csv opal-rock_opal2_1:/opt/opal/data/
+podman cp cnsim3.csv opal-rock_opal3_1:/opt/opal/data/
+
+
+# in each opal container:
+export CNSIM_FILE=cnsim<number>.csv
+opal user --opal http://localhost:8080 --user administrator --password $OPAL_ADMINISTRATOR_PASSWORD  --add --name guest --upassword Guest123!
+opal perm-datashield --opal http://localhost:8080 --user administrator --password $OPAL_ADMINISTRATOR_PASSWORD --type USER --subject guest --permission use --add
+opal project -o http://localhost:8080 -u administrator -p $OPAL_ADMINISTRATOR_PASSWORD --delete --name test
+opal project -o http://localhost:8080 -u administrator -p $OPAL_ADMINISTRATOR_PASSWORD --add --name test --database postgresdb
+opal file -up /opt/opal/data/$CNSIM_FILE /home/administrator -o http://localhost:8080 -u administrator -p $OPAL_ADMINISTRATOR_PASSWORD  -v
+cat /opt/opal/data/test_cnsim.json | opal rest -o http://localhost:8080 -u administrator -p $OPAL_ADMINISTRATOR_PASSWORD -m POST /datasource/test/tables --content-type "application/json" -v
+opal import-csv --o http://localhost:8080 --u administrator --password $OPAL_ADMINISTRATOR_PASSWORD --destination test --path /home/administrator/$CNSIM_FILE --tables CNSIM --type CNSIM
+opal perm-table --o http://localhost:8080 --u administrator --password $OPAL_ADMINISTRATOR_PASSWORD --type USER --project test --subject guest  --permission view --add --tables CNSIM
+
