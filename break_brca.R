@@ -5,19 +5,16 @@ setwd('/mnt/shareddisk/opal-test-data/')
 load('brca.RData')
 dfs <- brca[1:3]
   first <- sapply(dfs, function(dt){
-      #      sapply(organ, function(dt){
-            #  dt <- as.data.frame(dt)
-           #   dt <- dt[order(rownames(dt)),]
+  
              
-            #  ind <- 0
              dt<- pivot_longer(data.frame(PersonID=rownames(dt), dt),  !PersonID, names_to = "variable", values_to = "value")
-            vars <- lapply(names(dt), function(x){
-                list(name='PARTI', entityType='PARTICIPANT', valueType='decimal', isRepeatable=FALSE, index=ind)
-              #})
-              #dt <-cbind(rownames(dt), dt)
-              #names(dt)[1]<- 'PARTICIPANT_ID'
-              #list(dt = dt, vars = vars) 
-      #     }, simplify = FALSE)
+            vars <- list(
+                  list(name='PersonID', entityType='PARTICIPANT', valueType='text', isRepeatable=FALSE, index=ind),
+                  list(name='variable', entityType='PARTICIPANT', valueType='text', isRepeatable=FALSE, index=ind),
+                  list(name='value', entityType='PARTICIPANT', valueType='decimal', isRepeatable=FALSE, index=ind)
+             )
+            dt <- data.frame(PARTICIPANT_ID=1:nrow(dt), dt)
+            list(dt = dt, vars = vars) 
 }, simplify = FALSE)
 
 second <- sapply(omics.cancer, function(organ){
